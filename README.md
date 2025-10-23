@@ -6,7 +6,7 @@ Uma aplicação para planejamento de tarefas e organização pessoal/profissiona
 
 ## 📝 Sobre  
 
-O **Planner** é um projeto desenvolvido em **TypeScript** e **JavaScript**, com foco em auxiliar no gerenciamento de tarefas diárias.  
+O **Planner** é um projeto desenvolvido em **Next.js**, com foco em auxiliar no gerenciamento de tarefas diárias.  
 O objetivo é oferecer uma interface simples e intuitiva para **criar, editar e acompanhar tarefas** de forma prática.
 
 
