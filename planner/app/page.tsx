@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "primereact/button";
 import { useEffect, useState } from "react";
 
 type Estudo = {
@@ -82,11 +81,11 @@ export default function PlannerEstudos() {
 
   return (
     <main className="max-w-2xl mx-auto p-6 bg-[#F8F8FF] pt-10 rounded">
-      <h1 className="text-3xl font-bold mb-4 text-center"> Planner de Estudos</h1>
+      <h1 className="text-3xl font-bold mb-4 text-center text-[#4B0082]"> Planner de Estudos</h1>
 
       {/* Formulário */}
       <div className="border p-4 rounded mb-6 shadow border border-white">
-        <h2 className="text-xl mb-3 font-semibold">
+        <h2 className="text-xl mb-3 font-semibold text-[#4B0082]">
           {selecionado ? "Editar Estudo" : "Novo Estudo"}
         </h2>
 
@@ -108,6 +107,7 @@ export default function PlannerEstudos() {
 
           <label className="flex items-center gap-2 ">
             <input
+      
               type="checkbox"
               checked={form.concluido}
               onChange={(e) => setForm({ ...form, concluido: e.target.checked })}
@@ -149,19 +149,19 @@ export default function PlannerEstudos() {
       </div>
 
       {/* Lista de estudos */}
-      <h2 className="text-2xl font-semibold mb-3 ">Meus Estudos</h2>
-      <table className="w-full border border-white p-4 rounded mb-6 shadow">
+      <h2 className="text-2xl font-semibold mb-3 text-[#4B0082]">Meus Estudos</h2>
+      <table className="w-full border  border-white p-4 rounded mb-6 shadow">
         <thead>
-          <tr className="bg-white text-left">
-            <th className="p-2">Título</th>
-            <th className="p-2">Duração (h)</th>
-            <th className="p-2">Concluído</th>
-            <th className="p-2">Ações</th>
+          <tr className="text-left bg-[#4B0082] ">
+            <th className="p-2 text-white">Título</th>
+            <th className="p-2 text-white">Duração (h)</th>
+            <th className="p-2 text-white">Concluído</th>
+            <th className="p-2 text-white">Ações</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="">
           {estudos.map((e) => (
-            <tr key={e.id} className="border-t">
+            <tr key={e.id} className="border border-[#ffffff]">
               <td className="p-2">{e.titulo}</td>
               <td className="p-2">{e.duracao}</td>
               <td className="p-2">{e.concluido ? "Sim" : " Não"}</td>

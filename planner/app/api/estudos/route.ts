@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 
-import { Button } from 'primereact/button';
         
 type Estudo = {
   id: number;
