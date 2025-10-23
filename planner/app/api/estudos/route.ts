@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+import { Button } from 'primereact/button';
+        
 type Estudo = {
   id: number;
   titulo: string;
@@ -11,7 +13,7 @@ type Estudo = {
 let estudos: Estudo[] = [];
 let nextId = 1;
 
-// 🟢 CREATE
+// CREATE
 export async function POST(req: Request) {
   const { titulo, duracao, concluido } = await req.json();
   const novoEstudo: Estudo = { id: nextId++, titulo, duracao, concluido };
@@ -19,12 +21,12 @@ export async function POST(req: Request) {
   return NextResponse.json(novoEstudo);
 }
 
-// 🔵 READ (listar todos)
+// READ (listar todos)
 export async function GET() {
   return NextResponse.json(estudos);
 }
 
-// 🟠 UPDATE
+// UPDATE
 export async function PUT(req: Request) {
   const { id, titulo, duracao, concluido } = await req.json();
   const estudo = estudos.find((e) => e.id === id);
@@ -37,7 +39,7 @@ export async function PUT(req: Request) {
   return NextResponse.json(estudo);
 }
 
-// 🔴 DELETE
+// DELETE
 export async function DELETE(req: Request) {
   const { id } = await req.json();
   estudos = estudos.filter((e) => e.id !== id);
