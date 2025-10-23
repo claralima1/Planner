@@ -20,7 +20,7 @@ export async function POST(req: Request) {
   return NextResponse.json(novoEstudo);
 }
 
-// READ (listar todos)
+// listar todos
 export async function GET() {
   return NextResponse.json(estudos);
 }
