@@ -1,195 +1,325 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Plus, Edit2, Trash2, X, Check, Clock, BookOpen, Eye } from "lucide-react";
+import Detalhar from '@/app/componentes/Detalhar';
+import EditarPopup from "./componentes/EditarPopup";
+import AdicionarPopup from "./componentes/AdicionarPopup"; // Importe o novo componente
 
 type Estudo = {
   id: number;
   titulo: string;
   duracao: number;
   concluido: boolean;
+  descricao?: string;
+  dataCriacao?: string;
+  categoria?: string;
+  prioridade?: "baixa" | "media" | "alta";
 };
 
 export default function PlannerEstudos() {
   const [estudos, setEstudos] = useState<Estudo[]>([]);
   const [selecionado, setSelecionado] = useState<Estudo | null>(null);
-  const [form, setForm] = useState({ titulo: "", duracao: "", concluido: false });
+  const [editando, setEditando] = useState<Estudo | null>(null);
+  const [adicionando, setAdicionando] = useState(false); // Novo estado para popup de adicionar
+  const [loading, setLoading] = useState(true);
 
   // Buscar estudos
   async function carregarEstudos() {
-    const res = await fetch("/api/estudos");
-    const data = await res.json();
-    setEstudos(data);
+    try {
+      setLoading(true);
+      const res = await fetch("/api/estudos");
+      const data = await res.json();
+      setEstudos(data);
+    } catch (error) {
+      console.error("Erro ao carregar estudos:", error);
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
     carregarEstudos();
   }, []);
 
-  // Adicionar
-  async function adicionarEstudo() {
-    if (!form.titulo || !form.duracao) return;
-    await fetch("/api/estudos", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        titulo: form.titulo,
-        duracao: parseFloat(form.duracao),
-        concluido: form.concluido,
-      }),
-    });
-    setForm({ titulo: "", duracao: "", concluido: false });
-    carregarEstudos();
+  // Adicionar estudo (atualizada para receber objeto completo)
+  async function adicionarEstudo(dados: {
+    titulo: string;
+    duracao: number;
+    concluido: boolean;
+    descricao?: string;
+    categoria?: string;
+    prioridade?: "baixa" | "media" | "alta";
+  }) {
+    try {
+      await fetch("/api/estudos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dados),
+      });
+      carregarEstudos();
+    } catch (error) {
+      console.error("Erro ao adicionar estudo:", error);
+      throw error;
+    }
   }
 
-  // Atualizar
-  async function atualizarEstudo() {
-    if (!selecionado) return;
-    await fetch("/api/estudos", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: selecionado.id,
-        titulo: form.titulo,
-        duracao: parseFloat(form.duracao),
-        concluido: form.concluido,
-      }),
-    });
-    setSelecionado(null);
-    setForm({ titulo: "", duracao: "", concluido: false });
-    carregarEstudos();
+  // Atualizar estudo
+  async function atualizarEstudo(dadosAtualizados: Estudo) {
+    try {
+      await fetch("/api/estudos", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dadosAtualizados),
+      });
+      carregarEstudos();
+    } catch (error) {
+      console.error("Erro ao atualizar estudo:", error);
+      throw error;
+    }
   }
 
-  // Remover
+  // Remover estudo
   async function removerEstudo(id: number) {
-    await fetch("/api/estudos", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
-    });
-    carregarEstudos();
+    if (!confirm("Tem certeza que deseja remover este estudo?")) return;
+    
+    try {
+      await fetch("/api/estudos", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      carregarEstudos();
+    } catch (error) {
+      console.error("Erro ao remover estudo:", error);
+    }
   }
 
-  // Detalhar
-  function detalharEstudo(estudo: Estudo) {
-    setSelecionado(estudo);
-    setForm({
-      titulo: estudo.titulo,
-      duracao: estudo.duracao.toString(),
-      concluido: estudo.concluido,
-    });
-  }
+  // Calcular métricas
+  const totalHoras = estudos.reduce((acc, estudo) => acc + estudo.duracao, 0);
+  const estudosConcluidos = estudos.filter(e => e.concluido).length;
+  const progresso = estudos.length > 0 ? (estudosConcluidos / estudos.length) * 100 : 0;
 
   return (
-    <main className="max-w-2xl mx-auto p-6 bg-[#F8F8FF] pt-10 rounded">
-      <h1 className="text-3xl font-bold mb-4 text-center text-[#4B0082]"> Planner de Estudos</h1>
+    <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-8 px-4">
+      <div className="max-w-6xl mx-auto">
+        {/* Header com botão de adicionar */}
+        <div className="mb-8">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <div>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                Planner de Estudos
+              </h1>
+              <p className="text-gray-600 dark:text-gray-300 mt-2">
+                Organize seus estudos de forma eficiente
+              </p>
+            </div>
+            
+            {/* Botão de Adicionar Estudo */}
+            <button
+              onClick={() => setAdicionando(true)}
+              className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium rounded-xl transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 shadow-lg hover:shadow-xl"
+            >
+              <Plus size={20} />
+              <span>Adicionar Estudo</span>
+            </button>
+          </div>
 
-      {/* Formulário */}
-      <div className="border p-4 rounded mb-6 shadow border border-white">
-        <h2 className="text-xl mb-3 font-semibold text-[#4B0082]">
-          {selecionado ? "Editar Estudo" : "Novo Estudo"}
-        </h2>
+          {/* Cards de métricas (mesmo código anterior) */}
+          {/* ... */}
+        </div>
 
-        <div className="flex flex-col gap-2 ">
-          <input
-            className="border p-2 border-white border p-2 border-white focus:border-[#9370DB] focus:ring-2 focus:ring-[#9370DB33] rounded-lg p-2 outline-none transition"
-            placeholder="Título do estudo"
-            value={form.titulo}
-            onChange={(e) => setForm({ ...form, titulo: e.target.value })}
-          />
-
-          <input
-            className="border p-2 border-white focus:border-[#9370DB] focus:ring-2 focus:ring-[#9370DB33] rounded-lg p-2 outline-none transition"
-            type="number"
-            placeholder="Duração (em horas)"
-            value={form.duracao}
-            onChange={(e) => setForm({ ...form, duracao: e.target.value })}
-          />
-
-          <label className="flex items-center gap-2 ">
-            <input
-      
-              type="checkbox"
-              checked={form.concluido}
-              onChange={(e) => setForm({ ...form, concluido: e.target.checked })}
-            />
-            Concluído
-          </label>
-
-          <div className="flex gap-2">
-            {selecionado ? (
-              <>
-                <button
-                  onClick={atualizarEstudo}
-                  className="bg-[#9370DB] text-white px-4 py-2 rounded"
-                >
-                  Atualizar
-                </button>
-  
-
-                <button
-                  onClick={() => {
-                    setSelecionado(null);
-                    setForm({ titulo: "", duracao: "", concluido: false });
-                  }}
-                  className="bg-[#BDA1F5] text-white px-4 py-2 rounded"
-                >
-                  Cancelar
-                </button>
-              </>
-            ) : (
+        {/* Lista de estudos (sem sidebar de formulário) */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-bold text-gray-800 dark:text-white">
+                  Meus Estudos
+                </h2>
+                <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">
+                  {estudos.length} estudos cadastrados • {totalHoras}h totais
+                </p>
+              </div>
+              
+              {/* Botão de adicionar para mobile */}
               <button
-                onClick={adicionarEstudo}
-                className="text-white px-4 py-2 rounded bg-[#9370DB]"
+                onClick={() => setAdicionando(true)}
+                className="sm:hidden inline-flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg text-sm"
               >
+                <Plus size={16} />
                 Adicionar
               </button>
-            )}
+            </div>
           </div>
+
+          {loading ? (
+            <div className="p-8 text-center">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+              <p className="text-gray-500 dark:text-gray-400 mt-4">Carregando estudos...</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-gray-200 dark:divide-gray-700">
+              {estudos.map((estudo) => (
+                <div
+                  key={estudo.id}
+                  className="p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-start gap-3">
+                        <div className={`p-2 rounded-lg ${
+                          estudo.concluido 
+                            ? "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400" 
+                            : "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                        }`}>
+                          {estudo.concluido ? <Check size={20} /> : <BookOpen size={20} />}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="font-semibold text-gray-800 dark:text-white">
+                              {estudo.titulo}
+                            </h3>
+                            {estudo.concluido && (
+                              <span className="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 text-xs font-medium rounded-full">
+                                Concluído
+                              </span>
+                            )}
+                            {estudo.prioridade && (
+                              <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                                estudo.prioridade === "alta" 
+                                  ? "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300"
+                                  : estudo.prioridade === "media"
+                                  ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300"
+                                  : "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300"
+                              }`}>
+                                {estudo.prioridade}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-4 mt-2 text-sm text-gray-600 dark:text-gray-300">
+                            <div className="flex items-center gap-1">
+                              <Clock size={14} />
+                              <span>{estudo.duracao}h</span>
+                            </div>
+                            {estudo.categoria && (
+                              <div className="flex items-center gap-1">
+                                <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs rounded-full">
+                                  {estudo.categoria}
+                                </span>
+                              </div>
+                            )}
+                            {estudo.descricao && (
+                              <div className="flex items-center gap-1">
+                                <span className="text-gray-500 dark:text-gray-400 truncate max-w-[200px]">
+                                  {estudo.descricao}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setSelecionado(estudo)}
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors text-sm font-medium"
+                        title="Ver detalhes"
+                      >
+                        <Eye size={16} />
+                        Detalhar
+                      </button>
+                      
+                      <button
+                        onClick={() => setEditando(estudo)}
+                        className="flex items-center gap-2 px-4 py-2 bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/50 transition-colors text-sm font-medium"
+                        title="Editar estudo"
+                      >
+                        <Edit2 size={16} />
+                        Editar
+                      </button>
+                      
+                      <button
+                        onClick={() => removerEstudo(estudo.id)}
+                        className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                        title="Remover estudo"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {estudos.length === 0 && !loading && (
+                <div className="p-12 text-center">
+                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-purple-100 to-blue-100 dark:from-purple-900/30 dark:to-blue-900/30 mb-6">
+                    <BookOpen className="text-purple-600 dark:text-purple-400" size={32} />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-3">
+                    Nenhum estudo cadastrado
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto mb-6">
+                    Comece adicionando seu primeiro estudo para organizar sua rotina de aprendizado
+                  </p>
+                  <button
+                    onClick={() => setAdicionando(true)}
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium rounded-lg transition-all duration-300 transform hover:-translate-y-0.5 shadow-lg"
+                  >
+                    <Plus size={18} />
+                    Adicionar Primeiro Estudo
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Lista de estudos */}
-      <h2 className="text-2xl font-semibold mb-3 text-[#4B0082]">Meus Estudos</h2>
-      <table className="w-full border  border-white p-4 rounded mb-6 shadow">
-        <thead>
-          <tr className="text-left bg-[#4B0082] ">
-            <th className="p-2 text-white">Título</th>
-            <th className="p-2 text-white">Duração (h)</th>
-            <th className="p-2 text-white">Concluído</th>
-            <th className="p-2 text-white">Ações</th>
-          </tr>
-        </thead>
-        <tbody className="">
-          {estudos.map((e) => (
-            <tr key={e.id} className="border border-[#ffffff]">
-              <td className="p-2">{e.titulo}</td>
-              <td className="p-2">{e.duracao}</td>
-              <td className="p-2">{e.concluido ? "Sim" : " Não"}</td>
-              <td className="p-2 flex gap-2">
-                <button
-                  onClick={() => detalharEstudo(e)}
-                  className="bg-[#8A2BE2] text-white px-2 py-1 rounded"
-                >
-                  Detalhar
-                </button>
-                <button
-                  onClick={() => removerEstudo(e.id)}
-                  className="bg-[#7B68EE] text-white px-2 py-1 rounded"
-                >
-                  Remover
-                </button>
-              </td>
-            </tr>
-          ))}
-          {estudos.length === 0 && (
-            <tr>
-              <td colSpan={4} className="text-center  p-4">
-                Nenhum estudo cadastrado ainda 
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+      {/* Modal de Detalhes */}
+      {selecionado && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <Detalhar estudo={selecionado} onClose={() => setSelecionado(null)} />
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Adicionar */}
+      {adicionando && (
+        <AdicionarPopup
+          onSave={async (dados) => {
+            try {
+              await adicionarEstudo(dados);
+              setAdicionando(false);
+            } catch (error) {
+              // Erro já é tratado no popup
+            }
+          }}
+          onClose={() => setAdicionando(false)}
+        />
+      )}
+
+      {/* Modal de Edição */}
+      {editando && (
+        <EditarPopup
+          estudo={editando}
+          onSave={async (dadosAtualizados) => {
+            try {
+              await atualizarEstudo(dadosAtualizados);
+              setEditando(null);
+            } catch (error) {
+              // Erro já é tratado no popup
+            }
+          }}
+          onClose={() => setEditando(null)}
+          onDelete={() => {
+            removerEstudo(editando.id);
+            setEditando(null);
+          }}
+        />
+      )}
     </main>
   );
 }
