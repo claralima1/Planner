@@ -5,6 +5,7 @@ import { Plus, Edit2, Trash2, X, Check, Clock, BookOpen, Eye } from "lucide-reac
 import Detalhar from '@/app/componentes/Detalhar';
 import EditarPopup from "./componentes/EditarPopup";
 import AdicionarPopup from "./componentes/AdicionarPopup"; // Importe o novo componente
+import { listEstudos, createEstudo, updateEstudo, deleteEstudo } from '@/lib/estudoService';
 
 type Estudo = {
   id: number;
@@ -28,8 +29,7 @@ export default function PlannerEstudos() {
   async function carregarEstudos() {
     try {
       setLoading(true);
-      const res = await fetch("/api/estudos");
-      const data = await res.json();
+      const data = await listEstudos();
       setEstudos(data);
     } catch (error) {
       console.error("Erro ao carregar estudos:", error);
@@ -52,12 +52,8 @@ export default function PlannerEstudos() {
     prioridade?: "baixa" | "media" | "alta";
   }) {
     try {
-      await fetch("/api/estudos", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dados),
-      });
-      carregarEstudos();
+      await createEstudo(dados);
+      await carregarEstudos();
     } catch (error) {
       console.error("Erro ao adicionar estudo:", error);
       throw error;
@@ -67,12 +63,8 @@ export default function PlannerEstudos() {
   // Atualizar estudo
   async function atualizarEstudo(dadosAtualizados: Estudo) {
     try {
-      await fetch("/api/estudos", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dadosAtualizados),
-      });
-      carregarEstudos();
+      await updateEstudo(dadosAtualizados);
+      await carregarEstudos();
     } catch (error) {
       console.error("Erro ao atualizar estudo:", error);
       throw error;
@@ -84,12 +76,8 @@ export default function PlannerEstudos() {
     if (!confirm("Tem certeza que deseja remover este estudo?")) return;
     
     try {
-      await fetch("/api/estudos", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
-      });
-      carregarEstudos();
+      await deleteEstudo(id);
+      await carregarEstudos();
     } catch (error) {
       console.error("Erro ao remover estudo:", error);
     }
@@ -303,22 +291,26 @@ export default function PlannerEstudos() {
 
       {/* Modal de Edição */}
       {editando && (
-        <EditarPopup
-          estudo={editando}
-          onSave={async (dadosAtualizados) => {
-            try {
-              await atualizarEstudo(dadosAtualizados);
-              setEditando(null);
-            } catch (error) {
-              // Erro já é tratado no popup
-            }
-          }}
-          onClose={() => setEditando(null)}
-          onDelete={() => {
-            removerEstudo(editando.id);
-            setEditando(null);
-          }}
-        />
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <EditarPopup
+              estudo={editando}
+              onSave={async (dadosAtualizados) => {
+                try {
+                  await atualizarEstudo(dadosAtualizados);
+                  setEditando(null);
+                } catch (error) {
+                  // Erro já é tratado no popup
+                }
+              }}
+              onClose={() => setEditando(null)}
+              onDelete={() => {
+                removerEstudo(editando.id);
+                setEditando(null);
+              }}
+            />
+          </div>
+        </div>
       )}
     </main>
   );
