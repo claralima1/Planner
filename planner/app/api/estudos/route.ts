@@ -1,46 +1,29 @@
 import { NextResponse } from "next/server";
-
-        
-type Estudo = {
-  id: number;
-  titulo: string;
-  duracao: number;
-  concluido: boolean;
-};
-
-// Armazenamento em memória
-let estudos: Estudo[] = [];
-let nextId = 1;
+import * as store from '@/lib/server/estudoStore';
 
 // CREATE
 export async function POST(req: Request) {
-  const { titulo, duracao, concluido } = await req.json();
-  const novoEstudo: Estudo = { id: nextId++, titulo, duracao, concluido };
-  estudos.push(novoEstudo);
-  return NextResponse.json(novoEstudo);
+  const { titulo, duracao, concluido, descricao, categoria, prioridade } = await req.json();
+  const novo = store.create({ titulo, duracao, concluido, descricao, categoria, prioridade });
+  return NextResponse.json(novo);
 }
 
 // listar todos
 export async function GET() {
-  return NextResponse.json(estudos);
+  return NextResponse.json(store.listAll());
 }
 
 // UPDATE
 export async function PUT(req: Request) {
-  const { id, titulo, duracao, concluido } = await req.json();
-  const estudo = estudos.find((e) => e.id === id);
-  if (!estudo) return NextResponse.json({ error: "Estudo não encontrado" }, { status: 404 });
-
-  estudo.titulo = titulo;
-  estudo.duracao = duracao;
-  estudo.concluido = concluido;
-
-  return NextResponse.json(estudo);
+  const dados = await req.json();
+  const atualizado = store.update(dados);
+  if (!atualizado) return NextResponse.json({ error: "Estudo não encontrado" }, { status: 404 });
+  return NextResponse.json(atualizado);
 }
 
 // DELETE
 export async function DELETE(req: Request) {
   const { id } = await req.json();
-  estudos = estudos.filter((e) => e.id !== id);
+  store.remove(id);
   return NextResponse.json({ message: "Estudo removido" });
 }

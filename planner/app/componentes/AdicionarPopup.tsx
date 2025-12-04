@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Plus, Clock, Tag, Star, AlertCircle, Check, X, BookOpen } from "lucide-react";
+import { createEstudo } from '@/lib/estudoService';
 
 type FormData = {
   titulo: string;
@@ -13,7 +14,7 @@ type FormData = {
 };
 
 type Props = {
-  onSave: (dados: {
+  onSave?: (dados: {
     titulo: string;
     duracao: number;
     concluido: boolean;
@@ -65,14 +66,20 @@ export default function AdicionarPopup({ onSave, onClose }: Props) {
 
     try {
       setLoading(true);
-      await onSave({
+      const dadosParaCriar = {
         titulo: form.titulo,
         duracao: parseFloat(form.duracao),
         concluido: form.concluido,
         descricao: form.descricao,
         categoria: form.categoria,
         prioridade: form.prioridade
-      });
+      };
+
+      if (onSave) {
+        await onSave(dadosParaCriar);
+      } else {
+        await createEstudo(dadosParaCriar);
+      }
       
       // Reset form and close
       setForm({
@@ -185,15 +192,13 @@ export default function AdicionarPopup({ onSave, onClose }: Props) {
               value={form.titulo}
               onChange={(e) => handleChange("titulo", e.target.value)}
               className={`w-full px-4 py-3 rounded-xl border ${
-                errors.titulo 
-                  ? "border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20" 
-                  : "border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700"
-              } focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
+                errors.titulo ? 'border-red-300 dark:border-red-700' : 'border-gray-300 dark:border-gray-600'
+              } bg-transparent text-white placeholder-gray-300 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500`}
               placeholder="Ex: Aprender Next.js 14"
               autoFocus
             />
             {errors.titulo && (
-              <p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+              <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
                 <AlertCircle size={14} />
                 {errors.titulo}
               </p>
@@ -215,10 +220,8 @@ export default function AdicionarPopup({ onSave, onClose }: Props) {
                 value={form.duracao}
                 onChange={(e) => handleChange("duracao", e.target.value)}
                 className={`w-full px-4 py-3 pl-12 rounded-xl border ${
-                  errors.duracao 
-                    ? "border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20" 
-                    : "border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700"
-                } focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
+                  errors.duracao ? 'border-red-300 dark:border-red-700' : 'border-gray-300 dark:border-gray-600'
+                } bg-transparent text-white placeholder-gray-300 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500`}
                 placeholder="Ex: 2.5"
               />
               <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500">
@@ -226,7 +229,7 @@ export default function AdicionarPopup({ onSave, onClose }: Props) {
               </div>
             </div>
             {errors.duracao && (
-              <p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+              <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
                 <AlertCircle size={14} />
                 {errors.duracao}
               </p>
@@ -239,10 +242,10 @@ export default function AdicionarPopup({ onSave, onClose }: Props) {
                   type="button"
                   key={duracao.value}
                   onClick={() => handleChange("duracao", duracao.value)}
-                  className={`px-2 py-2 text-xs rounded-lg border transition-all ${
+                  className={`px-2 py-2 text-xs rounded-lg border ${
                     form.duracao === duracao.value
-                      ? "bg-purple-100 dark:bg-purple-900/40 border-purple-300 dark:border-purple-700 text-purple-700 dark:text-purple-300"
-                      : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      ? 'bg-purple-100 border-purple-300 text-purple-700'
+                      : 'border-gray-200 hover:bg-purple-100 hover:text-purple-700 dark:hover:bg-purple-900/40 dark:hover:text-purple-300'
                   }`}
                 >
                   {duracao.label}
@@ -260,11 +263,11 @@ export default function AdicionarPopup({ onSave, onClose }: Props) {
               value={form.descricao}
               onChange={(e) => handleChange("descricao", e.target.value)}
               rows={3}
-              className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
+              className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent text-white placeholder-gray-300 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
               placeholder="Descreva o que você vai estudar, objetivos, recursos..."
               maxLength={500}
             />
-            <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+            <p className="mt-2 text-xs text-gray-300 dark:text-gray-400">
               {500 - (form.descricao?.length || 0)} caracteres restantes
             </p>
           </div>
@@ -281,7 +284,7 @@ export default function AdicionarPopup({ onSave, onClose }: Props) {
                 <select
                   value={form.categoria || ""}
                   onChange={(e) => handleChange("categoria", e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all appearance-none"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent text-white placeholder-gray-300 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none"
                 >
                   <option value="">Selecione uma categoria</option>
                   {categoriasSugeridas.map((cat) => (
