@@ -196,7 +196,7 @@ export default function EditarPopup({ estudo, onSave, onClose, onDelete }: Props
                   key={d.value}
                   type="button"
                   onClick={() => setForm({ ...form, duracao: d.value })}
-                  className={`px-2 py-2 text-xs rounded-lg border ${form.duracao === d.value ? 'bg-purple-100 border-purple-300 text-purple-700' : 'border-gray-200 hover:bg-purple-100 hover:text-purple-700 dark:hover:bg-purple-900/40 dark:hover:text-purple-300'}`}
+                  className={`px-2 py-2 text-xs text-purple-300 rounded-lg border ${form.duracao === d.value ? 'bg-purple-100 border-purple-300 text-purple-700' : 'border-gray-200 hover:bg-purple-100 hover:text-purple-700 dark:hover:bg-purple-900/40 dark:hover:text-purple-300'}`}
                 >
                   {d.label}
                 </button>
