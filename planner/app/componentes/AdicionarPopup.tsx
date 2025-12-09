@@ -242,7 +242,7 @@ export default function AdicionarPopup({ onSave, onClose }: Props) {
                   type="button"
                   key={duracao.value}
                   onClick={() => handleChange("duracao", duracao.value)}
-                  className={`px-2 py-2 text-xs rounded-lg border ${
+                  className={`px-2 py-2 text-xs text-purple-300 rounded-lg border ${
                     form.duracao === duracao.value
                       ? 'bg-purple-100 border-purple-300 text-purple-700'
                       : 'border-gray-200 hover:bg-purple-100 hover:text-purple-700 dark:hover:bg-purple-900/40 dark:hover:text-purple-300'
@@ -284,7 +284,7 @@ export default function AdicionarPopup({ onSave, onClose }: Props) {
                 <select
                   value={form.categoria || ""}
                   onChange={(e) => handleChange("categoria", e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent text-white placeholder-gray-300 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent text-purple-500 placeholder-gray-300 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none"
                 >
                   <option value="">Selecione uma categoria</option>
                   {categoriasSugeridas.map((cat) => (
@@ -311,7 +311,7 @@ export default function AdicionarPopup({ onSave, onClose }: Props) {
                     type="button"
                     key={prio.value}
                     onClick={() => handleChange("prioridade", prio.value)}
-                    className={`px-3 py-2.5 text-sm font-medium rounded-lg border transition-all flex items-center justify-center gap-1 ${
+                    className={`px-3 py-2.5 text-sm font-medium text-white rounded-lg border transition-all flex items-center justify-center gap-1 ${
                       form.prioridade === prio.value
                         ? `${prio.bg} border-current ${prio.color}`
                         : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
