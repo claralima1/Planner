@@ -99,8 +99,67 @@ export default function PlannerEstudos() {
             </button>
           </div>
 
-          {/* Cards de métricas (mesmo código anterior) */}
-          {/* ... */}
+          {/* Cards de métricas */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Total de Estudos */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-xl">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                  <BookOpen className="text-purple-600 dark:text-purple-400" size={24} />
+                </div>
+                <span className="text-3xl font-bold text-purple-600 dark:text-purple-400">
+                  {estudos.length}
+                </span>
+              </div>
+              <h3 className="text-gray-600 dark:text-gray-300 font-medium">
+                Total de Estudos
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                {estudosConcluidos} concluídos
+              </p>
+            </div>
+
+            {/* Total de Horas */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-xl">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                  <Clock className="text-blue-600 dark:text-blue-400" size={24} />
+                </div>
+                <span className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+                  {totalHoras}h
+                </span>
+              </div>
+              <h3 className="text-gray-600 dark:text-gray-300 font-medium">
+                Horas de Estudo
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                Tempo total planejado
+              </p>
+            </div>
+
+            {/* Progresso */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-xl">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
+                  <Check className="text-green-600 dark:text-green-400" size={24} />
+                </div>
+                <span className="text-3xl font-bold text-green-600 dark:text-green-400">
+                  {progresso.toFixed(0)}%
+                </span>
+              </div>
+              <h3 className="text-gray-600 dark:text-gray-300 font-medium">
+                Progresso Geral
+              </h3>
+              <div className="mt-3">
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+                  <div 
+                    className="bg-gradient-to-r from-green-500 to-emerald-500 h-full rounded-full transition-all duration-500"
+                    style={{ width: `${progresso}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Lista de estudos (sem sidebar de formulário) */}

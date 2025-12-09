@@ -6,6 +6,7 @@ type Estudo = {
   descricao?: string;
   categoria?: string;
   prioridade?: "baixa" | "media" | "alta";
+  dataCriacao: string;
 };
 
 const API = "/api/estudos";

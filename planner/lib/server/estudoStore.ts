@@ -6,6 +6,7 @@ type Estudo = {
   descricao?: string;
   categoria?: string;
   prioridade?: "baixa" | "media" | "alta";
+  dataCriacao: string;
 };
 
 let estudos: Estudo[] = [];
@@ -15,8 +16,12 @@ export function listAll(): Estudo[] {
   return estudos;
 }
 
-export function create(dados: Omit<Estudo, 'id'>): Estudo {
-  const novo: Estudo = { id: nextId++, ...dados };
+export function create(dados: Omit<Estudo, 'id' | 'dataCriacao'>): Estudo {
+  const novo: Estudo = { 
+    id: nextId++, 
+    ...dados,
+    dataCriacao: new Date().toISOString()
+  };
   estudos.push(novo);
   return novo;
 }
