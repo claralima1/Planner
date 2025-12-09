@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Plus, Edit2, Trash2, X, Check, Clock, BookOpen, Eye } from "lucide-react";
-import Detalhar from '@/app/componentes/Detalhar';
-import EditarPopup from "./componentes/EditarPopup";
 import AdicionarPopup from "./componentes/AdicionarPopup"; // Importe o novo componente
-import { listEstudos, createEstudo, updateEstudo, deleteEstudo } from '@/lib/estudoService';
+import { listEstudos, createEstudo, deleteEstudo } from '@/lib/estudoService';
 
 type Estudo = {
   id: number;
@@ -20,8 +19,6 @@ type Estudo = {
 
 export default function PlannerEstudos() {
   const [estudos, setEstudos] = useState<Estudo[]>([]);
-  const [selecionado, setSelecionado] = useState<Estudo | null>(null);
-  const [editando, setEditando] = useState<Estudo | null>(null);
   const [adicionando, setAdicionando] = useState(false); // Novo estado para popup de adicionar
   const [loading, setLoading] = useState(true);
 
@@ -56,17 +53,6 @@ export default function PlannerEstudos() {
       await carregarEstudos();
     } catch (error) {
       console.error("Erro ao adicionar estudo:", error);
-      throw error;
-    }
-  }
-
-  // Atualizar estudo
-  async function atualizarEstudo(dadosAtualizados: Estudo) {
-    try {
-      await updateEstudo(dadosAtualizados);
-      await carregarEstudos();
-    } catch (error) {
-      console.error("Erro ao atualizar estudo:", error);
       throw error;
     }
   }
@@ -210,23 +196,23 @@ export default function PlannerEstudos() {
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => setSelecionado(estudo)}
+                      <Link
+                        href={`/detalhar/${estudo.id}`}
                         className="flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors text-sm font-medium"
                         title="Ver detalhes"
                       >
                         <Eye size={16} />
                         Detalhar
-                      </button>
+                      </Link>
                       
-                      <button
-                        onClick={() => setEditando(estudo)}
+                      <Link
+                        href={`/editar/${estudo.id}`}
                         className="flex items-center gap-2 px-4 py-2 bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/50 transition-colors text-sm font-medium"
                         title="Editar estudo"
                       >
                         <Edit2 size={16} />
                         Editar
-                      </button>
+                      </Link>
                       
                       <button
                         onClick={() => removerEstudo(estudo.id)}
@@ -265,15 +251,6 @@ export default function PlannerEstudos() {
         </div>
       </div>
 
-      {/* Modal de Detalhes */}
-      {selecionado && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <Detalhar estudo={selecionado} onClose={() => setSelecionado(null)} />
-          </div>
-        </div>
-      )}
-
       {/* Modal de Adicionar */}
       {adicionando && (
         <AdicionarPopup
@@ -287,30 +264,6 @@ export default function PlannerEstudos() {
           }}
           onClose={() => setAdicionando(false)}
         />
-      )}
-
-      {/* Modal de Edição */}
-      {editando && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <EditarPopup
-              estudo={editando}
-              onSave={async (dadosAtualizados) => {
-                try {
-                  await atualizarEstudo(dadosAtualizados);
-                  setEditando(null);
-                } catch (error) {
-                  // Erro já é tratado no popup
-                }
-              }}
-              onClose={() => setEditando(null)}
-              onDelete={() => {
-                removerEstudo(editando.id);
-                setEditando(null);
-              }}
-            />
-          </div>
-        </div>
       )}
     </main>
   );
