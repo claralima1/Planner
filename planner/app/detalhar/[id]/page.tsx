@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { listEstudos } from "@/lib/estudoService";
+import { getEstudo } from "@/lib/estudoService";
 import Detalhar from "@/app/componentes/Detalhar";
 
 type Estudo = {
@@ -38,14 +38,9 @@ export default function DetalharPage() {
           return;
         }
 
-        const estudos = await listEstudos();
-        const encontrado = estudos.find((e) => e.id === id);
-
-        if (encontrado) {
-          setEstudo(encontrado);
-        } else {
-          setErro("Estudo não encontrado");
-        }
+        const encontrado = await getEstudo(id);
+        if (encontrado) setEstudo(encontrado);
+        else setErro("Estudo não encontrado");
       } catch (error) {
         console.error("Erro ao carregar estudo:", error);
         setErro("Erro ao carregar os dados");

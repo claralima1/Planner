@@ -1,3 +1,5 @@
+import { HttpClient } from './httpClient';
+
 type Estudo = {
   id: number;
   titulo: string;
@@ -28,10 +30,7 @@ export async function listEstudos(): Promise<Estudo[]> {
     const local = loadLocal();
     if (local) { cache = local; return local; }
   }
-
-  const res = await fetch(API);
-  if (!res.ok) throw new Error("Erro ao listar estudos");
-  const data = await res.json();
+  const data = await HttpClient.get<Estudo[]>(API);
   cache = data;
   if (typeof window !== 'undefined') saveLocal(data);
   return data;
@@ -55,37 +54,19 @@ export async function createEstudo(dados: {
   categoria?: string;
   prioridade?: "baixa" | "media" | "alta";
 }): Promise<Estudo> {
-  const res = await fetch(API, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(dados),
-  });
-  if (!res.ok) throw new Error("Erro ao criar estudo");
-  const created = await res.json();
+  const created = await HttpClient.post<Estudo>(API, dados);
   invalidateCache();
   return created;
 }
 
 export async function updateEstudo(dados: Estudo): Promise<Estudo> {
-  const res = await fetch(API, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(dados),
-  });
-  if (!res.ok) throw new Error("Erro ao atualizar estudo");
-  const updated = await res.json();
+  const updated = await HttpClient.put<Estudo>(API, dados);
   invalidateCache();
   return updated;
 }
 
 export async function deleteEstudo(id: number): Promise<{ message?: string }> {
-  const res = await fetch(API, {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ id }),
-  });
-  if (!res.ok) throw new Error("Erro ao deletar estudo");
-  const out = await res.json();
+  const out = await HttpClient.delete<{ message?: string }>(API, { id });
   invalidateCache();
   return out;
 }

@@ -1,0 +1,25 @@
+{
+  "nextId": 4,
+  "estudos": [
+    {
+      "id": 2,
+      "titulo": "interfaces",
+      "duracao": 1.5,
+      "concluido": true,
+      "descricao": "aaa",
+      "categoria": "Testes",
+      "prioridade": "baixa",
+      "dataCriacao": "2025-12-10T21:32:41.429Z"
+    },
+    {
+      "id": 3,
+      "titulo": "Interfaces",
+      "duracao": 1.5,
+      "concluido": true,
+      "descricao": "aa",
+      "categoria": "Segurança",
+      "prioridade": "baixa",
+      "dataCriacao": "2025-12-10T21:33:34.533Z"
+    }
+  ]
+}
