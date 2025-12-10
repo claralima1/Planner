@@ -3,18 +3,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { listEstudos } from "@/lib/estudoService";
+import { listEstudos, getEstudo, updateEstudo, deleteEstudo } from "@/lib/estudoService";
 import EditarPopup from "@/app/componentes/EditarPopup";
-
-type Estudo = {
-  id: number;
-  titulo: string;
-  duracao: number;
-  concluido: boolean;
-  descricao?: string;
-  categoria?: string;
-  prioridade?: "baixa" | "media" | "alta";
-};
+import type { Estudo } from "@/lib/estudoService";
 
 export default function EditarPage() {
   const params = useParams();
@@ -34,14 +25,9 @@ export default function EditarPage() {
           return;
         }
 
-        const estudos = await listEstudos();
-        const encontrado = estudos.find((e) => e.id === id);
-
-        if (encontrado) {
-          setEstudo(encontrado);
-        } else {
-          setErro("Estudo não encontrado");
-        }
+        const encontrado = await getEstudo(id);
+        if (encontrado) setEstudo(encontrado);
+        else setErro("Estudo não encontrado");
       } catch (error) {
         console.error("Erro ao carregar estudo:", error);
         setErro("Erro ao carregar os dados");
@@ -57,14 +43,25 @@ export default function EditarPage() {
     router.back();
   };
 
-  const handleSave = async () => {
-    // Após salvar, redireciona de volta ou para a listagem
-    router.push("/");
+  const handleSave = async (dadosAtualizados: Estudo) => {
+    try {
+      await updateEstudo(dadosAtualizados);
+      router.push("/");
+    } catch (e) {
+      console.error("Erro ao atualizar estudo:", e);
+      setErro("Erro ao salvar alterações");
+    }
   };
 
   const handleDelete = async () => {
-    // Após deletar, redireciona para a listagem
-    router.push("/");
+    if (!estudo) return;
+    try {
+      await deleteEstudo(estudo.id);
+      router.push("/");
+    } catch (e) {
+      console.error("Erro ao excluir estudo:", e);
+      setErro("Erro ao excluir");
+    }
   };
 
   if (loading) {

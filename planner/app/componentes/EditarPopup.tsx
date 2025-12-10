@@ -3,16 +3,9 @@
 import React, { useEffect, useState } from "react";
 import { X, Clock, Tag, Star, AlertCircle, Check, BookOpen, ChevronDown, Trash2 } from "lucide-react";
 import { updateEstudo, deleteEstudo } from '@/lib/estudoService';
+import type { Estudo } from '@/lib/estudoService';
 
-type Estudo = {
-  id: number;
-  titulo: string;
-  duracao: number;
-  concluido: boolean;
-  descricao?: string;
-  categoria?: string;
-  prioridade?: "baixa" | "media" | "alta";
-};
+// Usa o tipo Estudo do service para manter compatibilidade com dataCriacao
 
 type Props = {
   estudo: Estudo;
