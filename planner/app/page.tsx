@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Plus, Edit2, Trash2, X, Check, Clock, BookOpen, Eye } from "lucide-react";
 import AdicionarPopup from "./componentes/AdicionarPopup"; // Importe o novo componente
@@ -18,9 +19,11 @@ type Estudo = {
 };
 
 export default function PlannerEstudos() {
+  const router = useRouter();
   const [estudos, setEstudos] = useState<Estudo[]>([]);
   const [adicionando, setAdicionando] = useState(false); // Novo estado para popup de adicionar
   const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Buscar estudos
   async function carregarEstudos() {
@@ -35,9 +38,16 @@ export default function PlannerEstudos() {
     }
   }
 
+  // Verificar autenticação
   useEffect(() => {
-    carregarEstudos();
-  }, []);
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/login');
+    } else {
+      setIsAuthenticated(true);
+      carregarEstudos();
+    }
+  }, [router]);
 
   // Adicionar estudo (atualizada para receber objeto completo)
   async function adicionarEstudo(dados: {
@@ -74,6 +84,23 @@ export default function PlannerEstudos() {
   const estudosConcluidos = estudos.filter(e => e.concluido).length;
   const progresso = estudos.length > 0 ? (estudosConcluidos / estudos.length) * 100 : 0;
 
+  // Exibir loading enquanto verifica autenticação
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    router.push('/login');
+  };
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-8 px-4">
       <div className="max-w-6xl mx-auto">
@@ -89,14 +116,26 @@ export default function PlannerEstudos() {
               </p>
             </div>
             
-            {/* Botão de Adicionar Estudo */}
-            <button
-              onClick={() => setAdicionando(true)}
-              className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium rounded-xl transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 shadow-lg hover:shadow-xl"
-            >
-              <Plus size={20} />
-              <span>Adicionar Estudo</span>
-            </button>
+            <div className="flex gap-2">
+              {/* Botão de Adicionar Estudo */}
+              <button
+                onClick={() => setAdicionando(true)}
+                className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium rounded-xl transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 shadow-lg hover:shadow-xl"
+              >
+                <Plus size={20} />
+                <span>Adicionar Estudo</span>
+              </button>
+              
+              {/* Botão de Logout */}
+              <button
+                onClick={handleLogout}
+                className="inline-flex items-center gap-2 px-4 py-3 bg-red-500 hover:bg-red-600 text-white font-medium rounded-xl transition-all duration-300"
+                title="Sair"
+              >
+                <X size={20} />
+                <span>Sair</span>
+              </button>
+            </div>
           </div>
 
           {/* Cards de métricas */}
