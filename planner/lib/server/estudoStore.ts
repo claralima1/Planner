@@ -10,6 +10,7 @@ type Estudo = {
   categoria?: string;
   prioridade?: "baixa" | "media" | "alta";
   dataCriacao: string;
+  username: string;
 };
 
 type StoreFile = {
@@ -42,9 +43,9 @@ function writeStore(store: StoreFile) {
   fs.writeFileSync(DATA_FILE, JSON.stringify(store, null, 2), 'utf-8');
 }
 
-export function listAll(): Estudo[] {
+export function listAll(username: string): Estudo[] {
   const store = readStore();
-  return store.estudos;
+  return store.estudos.filter((e) => e.username === username);
 }
 
 export function create(dados: Omit<Estudo, 'id' | 'dataCriacao'>): Estudo {
@@ -61,16 +62,16 @@ export function create(dados: Omit<Estudo, 'id' | 'dataCriacao'>): Estudo {
 
 export function update(dados: Estudo): Estudo | null {
   const store = readStore();
-  const idx = store.estudos.findIndex((e) => e.id === dados.id);
+  const idx = store.estudos.findIndex((e) => e.id === dados.id && e.username === dados.username);
   if (idx === -1) return null;
   store.estudos[idx] = { ...store.estudos[idx], ...dados };
   writeStore(store);
   return store.estudos[idx];
 }
 
-export function remove(id: number) {
+export function remove(id: number, username: string) {
   const store = readStore();
-  store.estudos = store.estudos.filter((e) => e.id !== id);
+  store.estudos = store.estudos.filter((e) => !(e.id === id && e.username === username));
   writeStore(store);
 }
 

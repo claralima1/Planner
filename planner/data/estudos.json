@@ -1,4 +1,37 @@
 {
-  "nextId": 4,
-  "estudos": []
+  "nextId": 7,
+  "estudos": [
+    {
+      "id": 4,
+      "titulo": "interfaces",
+      "duracao": 2,
+      "concluido": false,
+      "descricao": "",
+      "categoria": "Segurança",
+      "prioridade": "media",
+      "dataCriacao": "2026-01-21T17:04:14.210Z"
+    },
+    {
+      "id": 5,
+      "titulo": "poo",
+      "duracao": 2,
+      "concluido": false,
+      "descricao": "",
+      "categoria": "Banco de Dados",
+      "prioridade": "media",
+      "username": "teste1",
+      "dataCriacao": "2026-01-21T17:08:03.454Z"
+    },
+    {
+      "id": 6,
+      "titulo": "web",
+      "duracao": 1.5,
+      "concluido": false,
+      "descricao": "",
+      "categoria": "Segurança",
+      "prioridade": "baixa",
+      "username": "clara",
+      "dataCriacao": "2026-01-21T17:08:37.693Z"
+    }
+  ]
 }

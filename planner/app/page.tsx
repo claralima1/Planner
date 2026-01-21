@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Plus, Edit2, Trash2, X, Check, Clock, BookOpen, Eye } from "lucide-react";
 import AdicionarPopup from "./componentes/AdicionarPopup"; // Importe o novo componente
+import UserMenu from "./componentes/UserMenu";
 import { listEstudos, createEstudo, deleteEstudo } from '@/lib/estudoService';
 
 type Estudo = {
@@ -126,15 +127,8 @@ export default function PlannerEstudos() {
                 <span>Adicionar Estudo</span>
               </button>
               
-              {/* Botão de Logout */}
-              <button
-                onClick={handleLogout}
-                className="inline-flex items-center gap-2 px-4 py-3 bg-red-500 hover:bg-red-600 text-white font-medium rounded-xl transition-all duration-300"
-                title="Sair"
-              >
-                <X size={20} />
-                <span>Sair</span>
-              </button>
+              {/* User Menu */}
+              <UserMenu />
             </div>
           </div>
 

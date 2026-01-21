@@ -1,9 +1,17 @@
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
 
-export async function httpJson<T>(url: string, method: HttpMethod = "GET", body?: any): Promise<T> {
+export async function httpJson<T>(url: string, method: HttpMethod = "GET", body?: any): Promise<{ data: T; status: number }> {
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+
+  // Anexa token se existir no cliente
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('token');
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+  }
+
   const init: RequestInit = {
     method,
-    headers: { "Content-Type": "application/json" },
+    headers,
   };
   if (body !== undefined) {
     init.body = JSON.stringify(body);
@@ -26,11 +34,14 @@ export async function httpJson<T>(url: string, method: HttpMethod = "GET", body?
     throw new Error(message);
   }
 
+  let data;
   if (contentType.includes("application/json")) {
-    return (await res.json()) as T;
+    data = (await res.json()) as T;
+  } else {
+    data = (await res.text()) as unknown as T;
   }
-  // Fallback: try text
-  return (await res.text()) as unknown as T;
+
+  return { data, status: res.status };
 }
 
 export const HttpClient = {

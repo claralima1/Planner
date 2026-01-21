@@ -1,0 +1,19 @@
+{
+  "nextId": 3,
+  "users": [
+    {
+      "id": 1,
+      "username": "teste1",
+      "password": "$2b$10$6gVYKcWH3bN.4zOp89UKneYS5Tmm7Wwj7tVQBvrnPQRCcIgu3Umxa",
+      "email": "claralima601@gmail.com",
+      "dataCriacao": "2026-01-21T16:58:57.852Z"
+    },
+    {
+      "id": 2,
+      "username": "clara",
+      "password": "$2b$10$WaJx4i0PyJPQPhIORJ0Q1ui54WP.pGEtRIi4FKH9ScXk8wSmZTaQC",
+      "email": "claralima601@gmail.com",
+      "dataCriacao": "2026-01-21T17:03:43.718Z"
+    }
+  ]
+}
